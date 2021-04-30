@@ -1,8 +1,11 @@
 ---
 title: "Final Project"
 subtitle: "Data Science for Biologists, Spring 2021"
-author: "Your name goes here"
-output: html_document
+author: "Richard Demko"
+output: 
+  html_document:
+    theme: cerulean
+    highlight: tango 
 editor_options: 
   chunk_output_type: console
 ---
@@ -12,24 +15,30 @@ editor_options:
 knitr::opts_chunk$set(warning=FALSE, message=FALSE, echo = TRUE, include = TRUE)
 
 # Load all libraries you use HERE:
+library(tidyverse)
 ```
 
 <br><br>
 
 ## Introduction
+[Data](https://github.com/fivethirtyeight/nba-player-advanced-metrics)
 
 ```{r read-examine-data}
-
+nba_data <- read_csv("https://raw.githubusercontent.com/Rowan-BIOL01301/final_project-rdemko2332/master/Demko_nba-data-historical.csv")
+glimpse(nba_data)
+names(nba_data)
 ```
 
 <br><br>
 
 ## Question 1
 
-#### REPLACE TEXT WITH YOUR QUESTION. Your question should literally be a level-4 header.
+#### Do the positions we think shoot better actually shoot better? Do shooting Guards shoot better than PG, PG then SF, SF then PF and PF then Centers?
 
 ### Methods
+``` {r Question 1}
 
+```
 ### Answer
 
 Replace this text with your answer to your question.
@@ -39,10 +48,12 @@ Replace this text with your answer to your question.
 
 ## Question 2
 
-#### REPLACE TEXT WITH YOUR QUESTION. Your question should literally be a level-4 header.
+#### Have NBA players really started shooting a higher percentage of three-point shots as time goes on?
 
 ### Methods
+``` {r Question 2}
 
+```
 ### Answer
 
 Replace this text with your answer to your question.
@@ -51,10 +62,12 @@ Replace this text with your answer to your question.
 
 ## Question 3
 
-#### REPLACE TEXT WITH YOUR QUESTION. Your question should literally be a level-4 header.
+#### Do big men (PF and C) really get rebounds more often, and do smaller players (PG and SG) really get steals more often?
 
 ### Methods
+``` {r Question 3}
 
+```
 ### Answer
 
 Replace this text with your answer to your question.
@@ -64,10 +77,56 @@ Replace this text with your answer to your question.
 
 ## Question 4
 
-#### REPLACE TEXT WITH YOUR QUESTION. Your question should literally be a level-4 header.
+#### Was Shaq really a worse FT shooter than the average NBA Player?
 
 ### Methods
-
+``` {r Question 4, fig.width = 9, fig.height = 6}
+# Defines a variable as a string of years that Shaq played in the NBA
+shaq_years <- c(1993:2011)
+# Pipes the dataset into Mutate
+nba_data %>%
+  # Makes a new column named free_throw where if FT% equaled Null, it would be changed to 0, and if not it would stay the same.This is to remove Nulls. The NUlls were introduced because years would appear twice, one for regular season and once for post season. If a team didn't make the post-season, a null was introduced. Doing this and then doing the filter step (see below) allows the regular season data to count without introducing the post-season null
+  mutate(free_throw = if_else(`FT%` == "NULL", 
+                              "0",
+                              `FT%`)) %>%
+  # Makes a new column named is_shaq, where if name_common equals "Shaquille O'Neal, then it will come up as "Shaq" and if not "Other"
+  mutate(is_shaq = if_else(name_common == "Shaquille O'Neal", 
+                           "Shaq", 
+                           "Other"))%>%
+  # Selects the columns free_throw, year_id and is_shaq
+  select(free_throw, 
+         year_id, 
+         is_shaq) %>%
+  # Filters the data for where free_throw is greater than 0, and where only the years shaq played are counted
+  filter(free_throw > 0, 
+         year_id %in% shaq_years) %>%
+  # Groups the data by is_shaq and year_id
+  group_by(is_shaq, 
+           year_id) %>%
+  # Makes a new column where average_ft is equal to the mean of free_throw, being counted as a numeric data
+  summarize(average_ft = mean(as.numeric(free_throw))) %>%
+  # Starts ggplot()
+  ggplot() +
+  # Maps x to the year, y to average FT% and fill to if the player was Shaq or not
+  aes(x = year_id, 
+      y = average_ft, 
+      fill = is_shaq) +
+  # Makes a scatter plot where shape is a fillable circle, the outline is black and the size is 2
+  geom_point(shape = 21, 
+             color = "black", 
+             size = 2) +
+  # Sets the y limit to go all the way from 0 to 100 percent
+  ylim(0,
+       100) +
+  # Changes the legend title
+  scale_fill_discrete("Shaq or Other Player?") +
+  # Changes the x and y axis', the title and the subtitle
+  labs(x = "Year", 
+       y = "Free Throw %", 
+       title = "FT% of Shaq and the Average Player", 
+       subtitle = "Hack a Shaq")
+```
+<br>
 ### Answer
-
-Replace this text with your answer to your question.
+<br>
+Yes, he averaged a lower (and sometimes MUCH lower) average FT% than the average NBA player during his career... Hack a Shaq.
