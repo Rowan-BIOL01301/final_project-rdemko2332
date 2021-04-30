@@ -62,15 +62,26 @@ Replace this text with your answer to your question.
 
 ## Question 3
 
-#### Do big men (PF and C) really get rebounds more often, and do smaller players (PG and SG) really get steals more often?
+#### Do big men (PF and C) really get rebounds more often, and do smaller players (PG, SG and SF) really get steals more often?
 
 ### Methods
-``` {r Question 3}
-
+``` {r Question 3, fig.width = 9, fig.height = 6}
+small <- c("PG", "SG")
+nba_data %>%
+  mutate(big_or_small = if_else(pos %in% small, "PG/SG/SF", "PF/C")) %>%
+  select(big_or_small, `TRB%`, `STL%`) %>% 
+  group_by(big_or_small) %>%
+  summarise(Rebounds = mean(as.numeric(`TRB%`)), Steals = mean(as.numeric(`STL%`))) %>%
+  pivot_longer(!big_or_small, names_to = "Stats", values_to = "values") %>%
+  ggplot() +
+  aes(x = big_or_small, y = values, fill = Stats) +
+  geom_col(position = "dodge", color = "black") +
+  labs(x = "Position", y = "Number of Rebounds/Steals", title = "Rebounds and Steals for Larger and Smaller Positions")
 ```
+<br>
 ### Answer
 
-Replace this text with your answer to your question.
+Yes, PF/C really do get more rebounds than other PG/SG/PF, and PG/SG/PF really do get more steals than PF/C. It is important to note that while there is a very large size difference in rebounds, there are also many more rebounds per game than steals.
 
 
 <br><br>
@@ -124,7 +135,8 @@ nba_data %>%
   labs(x = "Year", 
        y = "Free Throw %", 
        title = "FT% of Shaq and the Average Player", 
-       subtitle = "Hack a Shaq")
+       subtitle = "Hack a Shaq") +
+  theme_light()
 ```
 <br>
 ### Answer
