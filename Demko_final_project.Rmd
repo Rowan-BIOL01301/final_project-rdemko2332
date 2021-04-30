@@ -66,17 +66,40 @@ Replace this text with your answer to your question.
 
 ### Methods
 ``` {r Question 3, fig.width = 9, fig.height = 6}
+# Defines a variable as the positions PG and SG
 small <- c("PG", "SG")
+# Pipes dataset into mutate()
 nba_data %>%
-  mutate(big_or_small = if_else(pos %in% small, "PG/SG/SF", "PF/C")) %>%
-  select(big_or_small, `TRB%`, `STL%`) %>% 
+  # Creates a new column named big_or_small that contains either PG/SG/SF if the position is in the small string, or PF/C if it is not
+  mutate(big_or_small = if_else(pos %in% small, 
+                                "PG/SG/SF", 
+                                "PF/C")) %>%
+  # Selects the columns big_or_small, TRB% and STL%
+  select(big_or_small, 
+         `TRB%`, 
+         `STL%`) %>% 
+  # Groups the data by big_or_small
   group_by(big_or_small) %>%
-  summarise(Rebounds = mean(as.numeric(`TRB%`)), Steals = mean(as.numeric(`STL%`))) %>%
-  pivot_longer(!big_or_small, names_to = "Stats", values_to = "values") %>%
+  # Creates two new columns, Rebounds and Steals, each to the average of their respective stat by their position groups 
+  summarise(Rebounds = mean(as.numeric(`TRB%`)), 
+            Steals = mean(as.numeric(`STL%`))) %>%
+  # Pivots the dataset longer by selecting all columns besides big_or_small, putting the names to a column named Stats and the values to a column named values
+  pivot_longer(!big_or_small, 
+               names_to = "Stats", 
+               values_to = "values") %>%
+  # Starts ggplot()
   ggplot() +
-  aes(x = big_or_small, y = values, fill = Stats) +
-  geom_col(position = "dodge", color = "black") +
-  labs(x = "Position", y = "Number of Rebounds/Steals", title = "Rebounds and Steals for Larger and Smaller Positions")
+  # Maps x to big_or_small, y to values and fill to Stats
+  aes(x = big_or_small, 
+      y = values, 
+      fill = Stats) +
+  # Makes a bar graph where the bars stand next to each other and are outlined in black
+  geom_col(position = "dodge", 
+           color = "black") +
+  # Changes the X and y axis' along with the title
+  labs(x = "Position", 
+       y = "Number of Rebounds/Steals", 
+       title = "Rebounds and Steals for Larger and Smaller Positions")
 ```
 <br>
 ### Answer
