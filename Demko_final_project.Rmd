@@ -5,7 +5,7 @@ author: "Richard Demko"
 output: 
   html_document:
     theme: cerulean
-    highlight: tango 
+    highlight: kate 
 editor_options: 
   chunk_output_type: console
 ---
@@ -33,15 +33,48 @@ names(nba_data)
 
 ## Question 1
 
-#### Do the positions we think shoot better actually shoot better? Do shooting Guards shoot better than PG, PG then SF, SF then PF and PF then Centers?
+#### Have NBA players started playing less minutes as time goes on, and have any positions specifically decreased in minutes?
 
 ### Methods
-``` {r Question 1}
-
+``` {r Question 1, fig.width = 7, fig.height = 4}
+# Creates a variable named common_pos, where it contains the string of the common positions in the NBA
+common_pos <- c("PG", "SG", "SF", "PF", "C")
+# Pipes the dataset into filter()
+nba_data %>% 
+  # Filters the data where position is common
+  filter(pos %in% common_pos) %>%
+  # Selects the columns year_id, MPG and pos
+  select(year_id, 
+         MPG, 
+         pos) %>%
+  # Groups the data by year and position
+  group_by(year_id, 
+           pos) %>%
+  # Creates a new column named average_minutes that is equal to the mean MPG
+  summarise(average_minutes = mean(MPG)) %>%
+  # Starts ggplot()
+  ggplot() +
+  # Maps x to year_id, y to average_minutes and color to a reordered position by common_pos
+  aes(x = year_id, 
+      y = average_minutes, 
+      color = fct_relevel(pos, 
+                          common_pos)) +
+  # Makes trendlines over time
+  geom_smooth() +
+  # Renames the legend
+  scale_color_discrete("Position") +
+  # Changes x and y axis' along with the title
+  labs(x = "NBA Season/Year", 
+       y = "Average Minutes Played Per Game", 
+       title = "Average MPG over the Seasons by Position") +
+  # Changes theme to theme light
+  theme_light()
 ```
+<br>
+
 ### Answer
 
-Replace this text with your answer to your question.
+Yes, almost all positions have decreased slightly over time. The Center position has decreased considerably since the 70's. Center minutes have decreased from 23 minutes during an average game to just under 19 minutes a game.
 
 
 <br><br>
@@ -52,18 +85,36 @@ Replace this text with your answer to your question.
 
 ### Methods
 ``` {r Question 2, fig.width = 7, fig.height = 4}
+# Pipes dataset into select
 nba_data %>%
-  select(year_id, `3PAr`) %>%
+  # Selects columns year_id and 3PAr
+  select(year_id, 
+         `3PAr`) %>%
+  # Filters the data for data before 1980 (no three point before that)
   filter(year_id >= 1980) %>%
+  # Groups the data by year
   group_by(year_id) %>%
+  # Creates a new column named average_3PA that is equal to the mean of 3PAr
   summarise(average_3PA = mean(as.numeric(`3PAr`))) %>%
+  # Starts ggplot()
   ggplot() +
-  aes(x = year_id, y = average_3PA) +
-  geom_point(shape = 21, fill = "dodgerblue", color = "black", size = 2) +
-  labs(x = "NBA Season/Year", y = "Share of Attempts that were Three-pointers", title = "Have NBA Players Really Started Shooting more Threes?") +
+  # Maps x to year_id, x to average_3PA
+  aes(x = year_id, 
+      y = average_3PA) +
+  # Makes a scatterplot where the points are fillable circles, filled dodgerblue, outlined in black and size 2
+  geom_point(shape = 21, 
+             fill = "dodgerblue", 
+             color = "black", 
+             size = 2) +
+  # Changes x and y axis' and changes the title
+  labs(x = "NBA Season/Year", 
+       y = "Share of Attempts that were Three-pointers", 
+       title = "Have NBA Players Really Started Shooting more Threes?") +
+  # Changes theme to theme light
   theme_light()
 ```
 <br>
+
 ### Answer
 
 Yes, since the NBA added the three point line in the 1979-1980 season, the percentage of three-point shots by players has increased dramatically.
@@ -112,10 +163,12 @@ nba_data %>%
        title = "Rebounds and Steals for Larger and Smaller Positions")
 ```
 <br>
+
 ### Answer
 
 Yes, PF/C really do get more rebounds than other PG/SG/PF, and PG/SG/PF really do get more steals than PF/C. It is important to note that while there is a very large size difference in rebounds, there are also many more rebounds per game than steals.
 <br><br>
+
 ## Question 4
 
 #### Was Shaq really a worse FT shooter than the average NBA Player?
@@ -170,6 +223,7 @@ nba_data %>%
   theme_light()
 ```
 <br>
+
 ### Answer
 <br>
 Yes, he averaged a lower (and sometimes MUCH lower) average FT% than the average NBA player during his career... Hack a Shaq.
