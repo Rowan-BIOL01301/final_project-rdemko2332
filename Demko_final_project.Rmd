@@ -51,12 +51,22 @@ Replace this text with your answer to your question.
 #### Have NBA players really started shooting a higher percentage of three-point shots as time goes on?
 
 ### Methods
-``` {r Question 2}
-
+``` {r Question 2, fig.width = 7, fig.height = 4}
+nba_data %>%
+  select(year_id, `3PAr`) %>%
+  filter(year_id >= 1980) %>%
+  group_by(year_id) %>%
+  summarise(average_3PA = mean(as.numeric(`3PAr`))) %>%
+  ggplot() +
+  aes(x = year_id, y = average_3PA) +
+  geom_point(shape = 21, fill = "dodgerblue", color = "black", size = 2) +
+  labs(x = "NBA Season/Year", y = "Share of Attempts that were Three-pointers", title = "Have NBA Players Really Started Shooting more Threes?") +
+  theme_light()
 ```
+<br>
 ### Answer
 
-Replace this text with your answer to your question.
+Yes, since the NBA added the three point line in the 1979-1980 season, the percentage of three-point shots by players has increased dramatically.
 
 <br><br>
 
@@ -105,10 +115,7 @@ nba_data %>%
 ### Answer
 
 Yes, PF/C really do get more rebounds than other PG/SG/PF, and PG/SG/PF really do get more steals than PF/C. It is important to note that while there is a very large size difference in rebounds, there are also many more rebounds per game than steals.
-
-
 <br><br>
-
 ## Question 4
 
 #### Was Shaq really a worse FT shooter than the average NBA Player?
@@ -149,6 +156,7 @@ nba_data %>%
   geom_point(shape = 21, 
              color = "black", 
              size = 2) +
+  geom_line() +
   # Sets the y limit to go all the way from 0 to 100 percent
   ylim(0,
        100) +
