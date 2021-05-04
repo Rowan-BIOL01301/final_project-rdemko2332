@@ -21,11 +21,15 @@ library(tidyverse)
 <br><br>
 
 ## Introduction
+I chose this dataset because I am interested in basketball, especially from a stats point of view. There are many variables, ranging from complex to simple. This data is from the late 1970's through today. Many of the NULLs you see are because the data doesn't contain certain data before a certain date. I can think of many questions that I could answer. Also, there are some fairly complex metrics that I am not familiar with, which I will enjoy researching. 
 [Data](https://github.com/fivethirtyeight/nba-player-advanced-metrics)
 
 ```{r read-examine-data}
+# Reads in the datset
 nba_data <- read_csv("https://raw.githubusercontent.com/Rowan-BIOL01301/final_project-rdemko2332/master/Demko_nba-data-historical.csv")
+# Reveals the columns of the dataset and some of the data
 glimpse(nba_data)
+# Reveals the variables of the dataset
 names(nba_data)
 ```
 
@@ -157,6 +161,8 @@ nba_data %>%
   # Makes a bar graph where the bars stand next to each other and are outlined in black
   geom_col(position = "dodge", 
            color = "black") +
+  # Changes the theme to theme light
+  theme_light() +
   # Changes the X and y axis' along with the title
   labs(x = "Position", 
        y = "Number of Rebounds/Steals", 
@@ -208,7 +214,7 @@ nba_data %>%
   # Makes a scatter plot where shape is a fillable circle, the outline is black and the size is 2
   geom_point(shape = 21, 
              color = "black", 
-             size = 2) +
+             size = 3) +
   geom_line() +
   # Sets the y limit to go all the way from 0 to 100 percent
   ylim(0,
